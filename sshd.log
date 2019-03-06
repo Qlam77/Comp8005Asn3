@@ -94,6 +94,8 @@ Feb 28 15:56:33 datacomm-192-168-0-5 sshd[4007]: Connection closed by authentica
 Feb 28 16:38:11 datacomm-192-168-0-5 sshd[7453]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.4  user=root
 Feb 28 16:38:11 datacomm-192-168-0-5 sshd[7453]: pam_succeed_if(sshd:auth): requirement "uid >= 1000" not met by user "root"
 Feb 28 16:38:13 datacomm-192-168-0-5 sshd[7453]: Failed password for root from 192.168.0.4 port 48222 ssh2
+Feb 28 16:38:13 datacomm-192-168-0-5 sshd[7453]: Failed password for root from 192.168.0.10 port 48222 ssh2
+Feb 28 16:38:13 datacomm-192-168-0-5 sshd[7453]: Failed password for root from 192.168.0.10 port 48222 ssh2
 Feb 28 16:38:13 datacomm-192-168-0-5 sshd[7453]: Connection closed by authenticating user root 192.168.0.4 port 48222 [preauth]
 Feb 28 17:24:54 datacomm-192-168-0-5 sshd[9683]: Invalid user Qlam77 from 192.168.0.233 port 53983
 Feb 28 17:24:59 datacomm-192-168-0-5 sshd[9683]: pam_unix(sshd:auth): check pass; user unknown
