@@ -27,10 +27,17 @@ class Client:
         self.timeStamps = copy.deepcopy(times)
     
     # calculates time between the earliest attempt and the latest attempt
-    def calcTimeBetween(self):
-        last = get_sec(self.timeStamps[len(self.timeStamps) - 1])
-        first = get_sec(self.timeStamps[0])
-        return last - first
+    def calcBan(self):
+        banned = False
+        if len(self.timeStamps) >= maxAttempts:
+            for x in range(0, len(self.timeStamps)):
+                if (x + maxAttempts) < len(self.timeStamps):
+                    last = get_sec(self.timeStamps[x + maxAttempts])
+                    first = get_sec(self.timeStamps[x])
+                    timeCalc = last - first
+                    if timeCalc > timeAllowed:
+                        banned = True
+        return banned
     
     # returns all the timestamps
     def getTimes(self):
@@ -88,9 +95,8 @@ def read_sshLog(f_ssh):
 
 def banSweep():
     for c in clientList:
-        if c.getAttempts() > maxAttempts:
-            if c.calcTimeBetween() > timeAllowed:
-                banList.append(c.ip)
+        if c.calcBan():
+            banList.append(c.ip)
 
 # record time since read to split what was checked
 currentDT = datetime.datetime.now()
