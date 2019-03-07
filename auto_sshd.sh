@@ -3,8 +3,9 @@
 sshdLogFile="/home/foo/Asn3/sshd.log"
 lastCheckedFile="/home/foo/Asn3/sinceTime.txt"
 banList="/home/foo/Asn3/bannedIps.txt"
-tmpBanFile="/home/foo/Asn3/tempBanFile.txt"
-banTimer=1
+currentlyBanned="/home/foo/Asn3/currentlyBanned.txt"
+tmpBanFile="/home/foo/Asn3/tmpBanFile.txt"
+banTimer=20
 
 # Exports log file with from last check time
 function exportSinceLog()
@@ -39,18 +40,24 @@ function banFromList()
     do
         #do action based on input of time checked and pipe to file
         IFS=' ' read ip timeSinceBan<<< "${ipToBan}"
-
         iptables -A INPUT -s ${ip} -j DROP
         iptables -A INPUT -d ${ip} -j DROP
         iptables -A OUTPUT -s ${ip} -j DROP
         iptables -A OUTPUT -d ${ip} -j DROP
-
+        echo "${ip} ${timeSinceBan}" >> ${currentlyBanned}
     done < "${banList}"
+
+    #clears ban list since they are all processed
+    rm "${banList}"
+
+    #remakes it for next time
+    touch "${banList}"
 }
 
 function unBanFromList()
 {
-    touch ${tmpBanFile}
+    #makes temp file for ban processing
+    touch "${tmpBanFile}"
     while IFS="\r\n" read ipToBan;
     do
         #do action based on input of time checked and pipe to file
@@ -62,6 +69,7 @@ function unBanFromList()
         z="$(expr $curTimeSinceEpoch - $ipToBanTimer)"
         z=${z#-}
 
+        #un ban them if they are over time limit
         if [ "$z" -ge "$banTimer" ];
         then
             iptables -D INPUT -s ${ip} -j DROP
@@ -70,17 +78,29 @@ function unBanFromList()
             iptables -D OUTPUT -d ${ip} -j DROP
         fi
 
+        #move to a tmp ban file for further processing later
         if [ "$z" -lt "$banTimer" ];
         then
-            echo "${ip} ${timeSinceBan}" >> ${tmpBanFile}
+            echo "${ip} ${timeSinceBan}" >> "${tmpBanFile}"
         fi
+    done < "${currentlyBanned}"
 
-    done < "${banList}"
-    cp ${tmpBanFile} ${banList}
+    cp ${tmpBanFile} ${currentlyBanned}
+
     rm ${tmpBanFile}
 }
 
+function clearMe()
+{
+    ip=25.67.176.150
+    iptables -D INPUT -s ${ip} -j DROP
+    iptables -D INPUT -d ${ip} -j DROP
+    iptables -D OUTPUT -s ${ip} -j DROP
+    iptables -D OUTPUT -d ${ip} -j DROP
+}
+
 #Main
+# clearMe
 unBanFromList
 checkLog
 ./script.py

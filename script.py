@@ -116,7 +116,7 @@ f_banned = open("bannedIps.txt", "w+")
 
 # settings
 maxAttempts = 3
-timeAllowed = 10 # in seconds
+timeAllowed = 1 # in seconds
 
 exportSinceRead(f_timer)
 read_sshLog(f)
