@@ -33,6 +33,20 @@ class Client:
         first = get_sec(self.timeStamps[0])
         return abs(last - first)
 
+
+    # calculates time between the earliest attempt and the latest attempt
+    def calcBan(self):
+        banned = False
+        if len(self.timeStamps) >= maxAttempts:
+            for x in range(0, len(self.timeStamps)):
+                if (x + maxAttempts) < len(self.timeStamps):
+                    last = get_sec(self.timeStamps[x + maxAttempts])
+                    first = get_sec(self.timeStamps[x])
+                    timeCalc = abs(last - first)
+                    if timeCalc < timeAllowed:
+                        banned = True
+        return banned
+
     # returns all the timestamps
     def getTimes(self):
         out = ''
@@ -92,9 +106,8 @@ def read_sshLog(f_ssh):
 
 def banSweep():
     for c in clientList:
-        if c.getAttempts() > maxAttempts:
-            if c.calcTimeBetween() > timeAllowed:
-                banList.append(c.ip)
+        if c.calcBan():
+            banList.append(c)
 
 def exportBanList(f_banned):
     for x in banList:
