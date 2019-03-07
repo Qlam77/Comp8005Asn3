@@ -8,7 +8,7 @@ import copy
 class Client:
     """
     Client
-    
+
     A class used to keep track of ssh attempt information.
 
     Attributes:
@@ -18,27 +18,27 @@ class Client:
     def __init__(self, ip=''):
         self.ip = ip
         self.timeStamps = []
-    
+
     # adds a timestamp
     def addTime(self, time):
         self.timeStamps.append(time)
-    
+
     def addTimes(self, times):
         self.timeStamps = copy.deepcopy(times)
-    
+
     # calculates time between the earliest attempt and the latest attempt
     def calcTimeBetween(self):
         last = get_sec(self.timeStamps[len(self.timeStamps) - 1])
         first = get_sec(self.timeStamps[0])
-        return last - first
-    
+        return abs(last - first)
+
     # returns all the timestamps
     def getTimes(self):
         out = ''
         for x in self.timeStamps:
             out += ('{},'.format(x))
         return out
-    
+
     def getAttempts(self):
         return len(self.timeStamps)
 
@@ -61,6 +61,9 @@ def read_ipCount(f_count):
 def write_to_log(f_log):
     for c in clientList:
         f_log.write(c.ip + ',' + c.getTimes() + '\n')
+
+def exportSinceRead(f_timer):
+    f_timer.write(str(currentDT.year) + "-" + str(currentDT.month) + "-" + str(currentDT.day) + " " + str(currentDT.hour) + ":" + str(currentDT.minute) + ":" + str(currentDT.second) + "\n")
 
 def read_sshLog(f_ssh):
     """
@@ -92,6 +95,10 @@ def banSweep():
             if c.calcTimeBetween() > timeAllowed:
                 banList.append(c.ip)
 
+def exportBanList(f_banned):
+    for x in banList:
+        f_banned.write(str(x) + " " + str(currentDT.year) + "-" + str(currentDT.month) + "-" + str(currentDT.day) + " " + str(currentDT.hour) + ":" + str(currentDT.minute) + ":" + str(currentDT.second) + "\n")
+
 # record time since read to split what was checked
 currentDT = datetime.datetime.now()
 
@@ -111,12 +118,12 @@ f_banned = open("bannedIps.txt", "w+")
 maxAttempts = 3
 timeAllowed = 10 # in seconds
 
-f_timer.write(str(currentDT.hour) + ":" + str(currentDT.minute) + ":" + str(currentDT.second))
-
+exportSinceRead(f_timer)
 read_sshLog(f)
 read_ipCount(f_logs)
 write_to_log(f_logs)
 banSweep()
+exportBanList(f_banned)
 
 print("map: {}".format(ip_dict))
 print("banList: {}".format(banList))
