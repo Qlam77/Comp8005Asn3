@@ -4,6 +4,7 @@ import io
 import datetime
 import re
 import copy
+from userSettings import maxAttempts, timeAllowed
 
 class Client:
     """
@@ -109,14 +110,9 @@ banList = []
 
 # sshd log file
 f = open("sshd.log", "r")
-f_settings = open("settings.txt", "r")
 f_timer = open("sinceTime.txt", "w")
 f_logs = open("ipCounter.txt", "w+")
 f_banned = open("bannedIps.txt", "w+")
-
-# settings
-maxAttempts = 3
-timeAllowed = 1 # in seconds
 
 exportSinceRead(f_timer)
 read_sshLog(f)
